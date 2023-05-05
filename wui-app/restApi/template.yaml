@@ -1,0 +1,15 @@
+Resources:
+  WuiAppRestAPIs:
+    Type: AWS::Serverless::Api
+
+  PageCloseFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: apidir/
+      Handler: app.lambdaHandler
+      Events:
+        PageClose:
+          Properties:
+            Path: /apipath
+            Method: get
+   

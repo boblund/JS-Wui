@@ -1,0 +1,21 @@
+{
+  "name": "webview",
+  "version": "0.0.0",
+  "description": "Nodejs wrapper for https://github.com/samhocevar/portable-file-dialogs",
+  "main": "test.js",
+  "bin": "test.js",
+  "private": true,
+  "dependencies": {
+    "node-addon-api": "^1.0.0"
+  },
+  "pkg": {
+    "targets": [
+      "node16-macos-arm64"
+    ],
+    "outputPath": "dist"
+  },
+  "scripts": {
+    "test": "node test.js"
+  },
+  "gypfile": true
+}

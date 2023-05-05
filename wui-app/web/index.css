@@ -1,0 +1,10 @@
+body {
+	padding: 2px;
+}
+
+.vertical-align {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	height: 50px;
+}

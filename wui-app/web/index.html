@@ -1,0 +1,62 @@
+<html>
+	<head>
+		<title>wui-app</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+		<link rel="stylesheet" href="./index.css">
+  </head>
+	<body>
+
+		<span class="vertical-align">
+				<p id="savedata">save this text to a file named 'myfile.txt'</p>&nbsp&nbsp
+				<button id="savebtn">Save</button>
+		</span>
+		</br>
+
+		<span class="vertical-align">
+			<button id="readbtn">Read 'myfile.txt'</button>&nbsp&nbsp
+			<textarea id="readdata" rows="1" cols="25">myfile.txt contents</textarea>
+		</span>
+		</br>
+
+		<span class="vertical-align">
+			<button id="selectfolderbtn">Select a folder</button>&nbsp&nbsp
+			<textarea id="selectfolderdata" rows="1" cols="25">Selected folder</textarea>
+		</span>
+		</br>
+
+		<span class="vertical-align">
+			<button id="messagebtn">Show message</button>&nbsp&nbsp
+			<textarea id="messageresp" rows="1" cols="25">Message response</textarea>
+		</span>
+		</br>
+
+		<span class="vertical-align">
+			<button id="notifybtn">Show notify</button>&nbsp&nbsp
+		</span>
+		</br>
+
+		<span class="vertical-align">
+			<button id="restapi">Call REST API</button>&nbsp&nbsp
+			<textarea id="restresp" rows="1" cols="25">REST API response</textarea>
+		</span>
+		</br>
+
+		<span class="vertical-align">
+			<button id="startbtn">Start Wui IPC</button>
+			<button id="stopbtn" hidden>Stop Wui IPC</button>
+			&nbsp&nbsp<p>Wui IPC response</p>&nbsp&nbsp
+			<textarea id="wsresp" rows="1" cols="60"></textarea>
+		</span>
+		</br>
+
+	</body>
+	<script src="./portableDialogs.js"></script>
+	<script src="./restapi.js"></script>
+	<script src="./wuiipc.js"></script>
+	<script>
+		window.resizeTo(
+			window.screen.availWidth * .5,
+			window.screen.availHeight * .3
+		);
+	</script>
+</html>

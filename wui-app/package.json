@@ -1,0 +1,40 @@
+{
+  "name": "wuiapp",
+  "bin": "wuiApp.js",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "express": "^4.18.1"
+  },
+  "pkg": {
+    "assets": [
+      "web/*",
+      "restApi/*.yaml",
+      "wsApi/*.yaml"
+    ],
+    "scripts": [
+			"./*.js",
+			"web/*.js",
+      "restApi/**/*.js",
+      "wsApi/**/*.js"
+    ],
+    "targets": [
+      "node16-macos-arm64"
+    ],
+    "outputPath": "dist"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "js-yaml": "^4.1.0",
+    "minimist": "^1.2.6",
+    "ws": "^8.8.1",
+    "yaml-cfn": "^0.3.1",
+    "yamljs": "^0.3.0"
+  }
+}

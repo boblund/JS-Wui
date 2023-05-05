@@ -1,0 +1,49 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description:
+  wui app websockets
+Resources:
+  BrumeAWSWebSocket:
+    Type: AWS::ApiGatewayV2::Api
+    Properties:
+      Name: BrumeAWSWebSocket
+      ProtocolType: WEBSOCKET
+      RouteSelectionExpression: "$request.body.action"
+  
+  ConnectRoute:
+    Type: WUI::Route
+    Properties:
+      ApiId: !Ref BrumeAWSWebSocket
+      RouteKey: $connect
+      IntegrationUri: OnConnectFunction
+  
+  DisconnectRoute:
+    Type: WUI::Route
+    Properties:
+      ApiId: !Ref BrumeAWSWebSocket
+      RouteKey: $disconnect
+      IntegrationUri: OnDisconnectFunction
+    
+  WuiipcRoute:
+    Type: WUI::Route
+    Properties:
+      ApiId: !Ref BrumeAWSWebSocket
+      RouteKey: wuiipc
+      IntegrationUri: WuiipcFunction
+  
+  OnConnectFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: onconnect/
+      Handler: app.handler
+
+  OnDisconnectFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ondisconnect/
+      Handler: app.handler
+
+  WuiipcFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: wuiipc/
+      Handler: app.handler
