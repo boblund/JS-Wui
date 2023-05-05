@@ -9,18 +9,21 @@
 
 using namespace std;
 
-//webview::webview w(true, nullptr);
-
 void Start(const Napi::CallbackInfo& info) {
-	webview::webview w(true, nullptr);
 	//Napi::Env env = info.Env();
 	Napi::Object obj = info[0].As<Napi::Object>();
 	Napi::Uint16Array uint16Array = obj.Get("size").As<Napi::TypedArray>()
 		.As<Napi::Uint16Array>();
-  std::string title = obj.Get("title").ToString().Utf8Value().c_str();
-	std::string url = obj.Get("url").ToString().Utf8Value().c_str();
 	int width = uint16Array[0];
 	int height = uint16Array[1];
+  std::string title = obj.Get("title").ToString().Utf8Value().c_str();
+	std::string url = obj.Get("url").ToString().Utf8Value().c_str();
+	bool debug =  obj.Get("debug").ToBoolean();
+
+	webview::webview w(debug, nullptr);
+	w.set_title(title);
+	w.set_size(width, height, WEBVIEW_HINT_NONE);
+	w.navigate(url);
 
 	w.bind("writeFileDialog", [](std::string s) -> std::string {
 		auto r = pfd::save_file("Choose file to save", webview::json_parse(s, "", 0),
@@ -68,7 +71,6 @@ void Start(const Napi::CallbackInfo& info) {
 				}
 				i++;
 			}
-			//return "{\"data\":\"" + str + "\"}";
 		}
 		return "{\"data\":\"" + str + "\"}";
 	});
@@ -174,9 +176,6 @@ void Start(const Napi::CallbackInfo& info) {
 		};
 	)"""");
 
-	w.set_title(title);
-	w.set_size(width, height, WEBVIEW_HINT_NONE);
-	w.navigate(url);
 	w.run();
 }
 

@@ -32,7 +32,8 @@ process.on('SIGINT', ()=> {
 			[JSON.stringify({
 				title: process.argv[1].split('/').pop().replace('.js', ''),
 				size: [700, 400],
-				url: `http://127.0.0.1:${serverPort}`
+				url: `http://127.0.0.1:${serverPort}`,
+				debug: true
 			})],
 			{ silent: true });
 
