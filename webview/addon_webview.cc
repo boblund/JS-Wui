@@ -9,10 +9,19 @@
 
 using namespace std;
 
-webview::webview w(true, nullptr);
+//webview::webview w(true, nullptr);
 
 void Start(const Napi::CallbackInfo& info) {
+	webview::webview w(true, nullptr);
 	//Napi::Env env = info.Env();
+	Napi::Object obj = info[0].As<Napi::Object>();
+	Napi::Uint16Array uint16Array = obj.Get("size").As<Napi::TypedArray>()
+		.As<Napi::Uint16Array>();
+  std::string title = obj.Get("title").ToString().Utf8Value().c_str();
+	std::string url = obj.Get("url").ToString().Utf8Value().c_str();
+	int width = uint16Array[0];
+	int height = uint16Array[1];
+
 	w.bind("writeFileDialog", [](std::string s) -> std::string {
 		auto r = pfd::save_file("Choose file to save", webview::json_parse(s, "", 0),
 														{ "Text Files (.txt .text)", "*.txt *.text" },
@@ -164,45 +173,15 @@ void Start(const Napi::CallbackInfo& info) {
 			}
 		};
 	)"""");
-}
 
-Napi::Value Set_title(const Napi::CallbackInfo& info) {
-	Napi::Env env = info.Env();
-	w.set_title(info[0].As<Napi::String>());
-	return Napi::String::New(env, "done");
-}
-
-Napi::Value Set_size(const Napi::CallbackInfo& info) {
-	Napi::Env env = info.Env();
-	w.set_size(info[0].ToNumber(), info[1].ToNumber(), WEBVIEW_HINT_NONE);
-	return Napi::String::New(env, "done");
-}
-
-Napi::Value Set_html(const Napi::CallbackInfo& info) {
-	Napi::Env env = info.Env();
-	w.set_html(info[0].As<Napi::String>());
-	return Napi::String::New(env, "done");
-}
-
-Napi::Value Navigate(const Napi::CallbackInfo& info) {
-	Napi::Env env = info.Env();
-	w.navigate(info[0].As<Napi::String>());
-	return Napi::String::New(env, "done");
-}
-
-Napi::Value Run(const Napi::CallbackInfo& info) {
-	Napi::Env env = info.Env();
+	w.set_title(title);
+	w.set_size(width, height, WEBVIEW_HINT_NONE);
+	w.navigate(url);
 	w.run();
-	return Napi::String::New(env, "done");
 }
 
 Napi::Object Init(Napi::Env env, Napi::Object exports) {
 	exports.Set("start", Napi::Function::New(env, Start));
-	exports.Set("set_title", Napi::Function::New(env, Set_title));
-	exports.Set("set_size", Napi::Function::New(env, Set_size));
-	exports.Set("set_html", Napi::Function::New(env, Set_html));
-	exports.Set("navigate", Napi::Function::New(env, Navigate));
-  exports.Set("run", Napi::Function::New(env, Run));
   return exports;
 }
 
