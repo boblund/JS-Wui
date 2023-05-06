@@ -12,24 +12,16 @@ using namespace std;
 void Start(const Napi::CallbackInfo& info) {
 	//Napi::Env env = info.Env();
 	Napi::Object obj = info[0].As<Napi::Object>();
-	Napi::Uint16Array uint16Array = obj.Get("size").As<Napi::TypedArray>()
-		.As<Napi::Uint16Array>();
-	int width = uint16Array[0];
-	int height = uint16Array[1];
-  std::string title = obj.Get("title").ToString().Utf8Value().c_str();
-	std::string url = obj.Get("url").ToString().Utf8Value().c_str();
-	bool debug =  obj.Get("debug").ToBoolean();
-
-	webview::webview w(debug, nullptr);
-	w.set_title(title);
-	w.set_size(width, height, WEBVIEW_HINT_NONE);
-	w.navigate(url);
+	Napi::Uint16Array sizeArray = obj.Get("size").As<Napi::Uint16Array>();
+	webview::webview w(obj.Get("debug").ToBoolean(), nullptr);
+	w.set_title(obj.Get("title").ToString().Utf8Value().c_str());
+	w.set_size(sizeArray[0], sizeArray[1], WEBVIEW_HINT_NONE);
+	w.navigate(obj.Get("url").ToString().Utf8Value().c_str());
 
 	w.bind("writeFileDialog", [](std::string s) -> std::string {
 		auto r = pfd::save_file("Choose file to save", webview::json_parse(s, "", 0),
 														{ "Text Files (.txt .text)", "*.txt *.text" },
 														pfd::opt::force_overwrite).result();
-
 		return "{\"path\":\"" + r + "\"}";
 	});
 
