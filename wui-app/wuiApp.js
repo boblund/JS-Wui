@@ -6,19 +6,8 @@
 
 const { join } = require('path'),
 	{ fork } = require('child_process'),
-	server = require('./server/server.js');
-
-let apis = {
-	web: { filesPath: join(__dirname, './web')},
-	rest: {
-		filesPath: join(__dirname, './restApi'),
-		templateName: 'template.yaml'
-	},
-	ws: {
-		filesPath: join(__dirname, './wsApi'),
-		templateName: 'template.yaml'
-	}
-};
+	server = require('./server/server.js'),
+	{apis, window: {title, size}} = require('./appConfig.js');
 
 process.on('SIGINT', ()=> {
 	console.log('SIGINT');
@@ -30,8 +19,8 @@ process.on('SIGINT', ()=> {
 		const serverPort = await server(apis);
 		const webviewChild = fork(join(__dirname, './webview.js'),
 			[JSON.stringify({
-				title: process.argv[1].split('/').pop().replace('.js', ''),
-				size: [700, 400],
+				title,
+				size,
 				url: `http://127.0.0.1:${serverPort}`,
 				debug: true
 			})],
