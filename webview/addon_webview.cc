@@ -20,15 +20,17 @@ void Start(const Napi::CallbackInfo& info) {
 
 	w.bind("writeFileDialog", [](std::string s) -> std::string {
 		auto r = pfd::save_file("Choose file to save", webview::json_parse(s, "", 0),
-														{ "Text Files (.txt .text)", "*.txt *.text" },
-														pfd::opt::force_overwrite).result();
+			{ "Text Files (.txt .text)", "*.txt *.text" },
+			pfd::opt::force_overwrite
+		).result();
 		return "{\"path\":\"" + r + "\"}";
 	});
 
 	w.bind("readFileDialog", [](std::string s) -> std::string {
 		auto f = pfd::open_file("Choose files to read", webview::json_parse(s, "", 0),
-													{ "Text Files (.txt .text)", "*.txt *.text", "All Files", "*" },
-													pfd::opt::multiselect);
+			{ "Text Files (.txt .text)", "*.txt *.text", "All Files", "*" },
+			pfd::opt::multiselect
+		);
 		std::string out = "";
 		for(auto& it:f.result()) {out += it;}
 		return "{\"path\":\"" + out + "\"}";
