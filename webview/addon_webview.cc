@@ -125,13 +125,13 @@ void Start(const Napi::CallbackInfo& info) {
 		delete message;
 		delete notify;
 
-		let id = 1,
-			maxQueueLength = 0,
+		let maxQueueLength = 0,
 			ipcQueue = {},
 			wuiIpcKeys=[],
 			websocket = new WebSocket(`ws://${window.location.host}`);
 
 		Wui.sendIpc = (type, msg, cb=null) => {
+			const id = btoa(Math.random().toString()).slice(3);
 			let rVal = null;
 			if( cb != null ) {
 				ipcQueue[id] = cb;
@@ -145,7 +145,7 @@ void Start(const Napi::CallbackInfo& info) {
 		
 			websocket.send(JSON.stringify({
 				action: type,
-				data: {id: id++, ...msg}
+				data: {id, ...msg}
 			}));
 		
 			return rVal;
