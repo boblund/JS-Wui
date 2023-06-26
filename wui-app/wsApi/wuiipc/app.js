@@ -13,8 +13,10 @@ exports.handler = async (event, context) => {
 		ConnectionId: global.connectionId,
 		Data: JSON.stringify({
 			id: data.id,
-			type: 'someNodeFunctionResp',
-			value: 'response'
+			msg: {
+				type: 'someNodeFunctionResp',
+				value: 'response'
+			}
 		})
 	});
 

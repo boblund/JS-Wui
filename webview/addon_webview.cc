@@ -137,29 +137,29 @@ void Start(const Napi::CallbackInfo& info) {
 				ipcQueue[id] = cb;
 			} else {
 				rVal = new Promise((res, rej) => {
-					ipcQueue[id] = (error, {type, value}) => {
-						(error ? rej : res)({type, value});
+					ipcQueue[id] = (error, msg) => {
+						(error ? rej : res)(msg);
 					};
 				});
 			}
 		
 			websocket.send(JSON.stringify({
 				action: type,
-				data: {id, ...msg}
+				data: {id, msg}
 			}));
 		
 			return rVal;
 		};
 
-		websocket.onmessage = msg => {
-			let id, type, value;
+		websocket.onmessage = wsMsg => {
+			let id, msg;
 		
 			try {
-				({id, type, value} = JSON.parse( msg.data ));
+				({id, msg} = JSON.parse( wsMsg.data ));
 				let error = false;
 		
 				if(ipcQueue[id] != 'undefined') {
-					ipcQueue[id](error, {type, value});
+					ipcQueue[id](error, msg);
 					delete ipcQueue[ id ];
 				} else {
 					console.error(`error: ipcQueue[${id}] undefined`);

@@ -26,7 +26,7 @@ async function start(){
 		if( Math.round(Math.random()) == 1 ? 'await' : 'cb' === 'await' ) { // random send modes
 			let resp;
 			try {
-				resp = await Wui.sendIpc('wuiipc', JSON.stringify(msg) );
+				resp = await Wui.sendIpc('wuiipc', msg); //JSON.stringify(msg) );
 				// do something with resp
 				wsresp.innerHTML = `await: ${JSON.stringify(resp)}`;
 			} catch(e) {
