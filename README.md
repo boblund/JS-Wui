@@ -6,11 +6,9 @@ JS-Wui (JavaScript Webview user interface) is used to create standalone cross-pl
 
 [Wui Interface](#wui)
 
-[Developing an app](#using)
+[Using the example](#using)
 
-[Building wui-app ](#building)
-
-[Extending wui-app](#extending)
+[Building you app](#building)
 
 [License](#license)
 
@@ -159,15 +157,40 @@ http.open('POST', `${window.location.href}api/doSomething`);
 http.send();
 ```
 
-# Developing an app <a name="using"></a>
+# Using <a name="using"></a>
 
 Install the repo.
 
 ```
 git clone git@github.com:boblund/JS-Wui.git
 cd JS-Wui
-npm install
 ```
+
+Then, build the webview add-on. Node-gyp needs to be installed for this.
+
+```
+cd webview
+npm install
+cp build/Release/addon_webview.node ../wui-app/
+```
+
+Then, install and run the example wuiApp.
+
+```
+cd ../wui-app
+npm install
+node wuiApp.js
+```
+
+An executable version of the wuiApp.js can be made with [pkg](https://www.npmjs.com/package/pkg). In the wui-app directory, The ```package.json``` property ```name``` will be your executable name. The ```targets``` property will be the executable versions built. Then run:
+
+```
+pkg .
+```
+
+This will leave executable files in the ```dist``` directory.
+
+# Building you app <a name="building"></a>
 
 A JS-wui app is essentially a web site consisting of static web pages, REST interfaces and a Websocket interface. An app is organized as follows:
 ```
@@ -182,6 +205,7 @@ JS-Wui/
 |         |--- apidir/
 |         |--- template.yaml
 |    |--- appConfig.js
+|    |--- addon_webview.node
 ```
 
 - webview/ contains the webview C++ addon, that does not need to be changed.
@@ -197,12 +221,6 @@ The REST and Webscoket intefaces are described in ```template.yaml``` that defin
 		- ```Handler``` is the handler function file name minus the extenstion'.
 
 Each interface handler is in a sub-directory ```CodeUri```. The subdirectory contains the hander logic ```app.js``` that exports a function, e.g. ```app.lambdaHandler```.
-
-# Example <a name="example"></a>
-
-The ```wui-app``` directory contains an example of a JS-Wui app.
-
-# Building a JS-Wui app <a name="building"></a>
 
 # License <a name="license"></a>
 
