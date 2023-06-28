@@ -5,12 +5,10 @@ const { join } = require('path');
 exports.apis = {
 	web: { filesPath: join(__dirname, './web')},
 	rest: {
-		filesPath: join(__dirname, './restApi'),
-		templateName: 'template.yaml'
+		filesPath: join(__dirname, './restApi')
 	},
 	ws: {
-		filesPath: join(__dirname, './wsApi'),
-		templateName: 'template.yaml'
+		filesPath: join(__dirname, './wsApi')
 	}
 };
 
