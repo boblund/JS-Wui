@@ -6,8 +6,19 @@
 
 const express = require('express');
 const bodyParser = require('body-parser');
+const {readdirSync, readFileSync} = require('fs');
+const path = require('path');
 
-function restApiGw(app, restApi) {
+function restApiGw(app, apiPath) {
+	let lambdas = {};
+	readdirSync(apiPath).forEach(route => {
+		const methods = readdirSync(apiPath + '/' + route);
+		lambdas[route] = {};
+		for(const method of methods){
+			lambdas[route][path.parse(method).name] = require(`${apiPath}/${route}/${method}`)['lambdaHandler'];
+		}
+	});
+
 	app.use((req, res, next) => {
 		if (req.originalUrl === '/api/webhook') {
 			bodyParser.raw({ type: 'application/json' })(req, res, next);
@@ -20,14 +31,14 @@ function restApiGw(app, restApi) {
 	app.use(express.text());
 	app.use(require('cors')());
 
-	const apiGw = new (require('./ApiGw'))(restApi);
+	//const apiGw = new (require('./ApiGw'))(restApi);
 
 	app.use('/api/*', async (req, res) => {
-		let route = req.baseUrl.replace(/^\/[^/]*\//, "/");
-		// invoke should consider reg.method
-		const result = await apiGw.invoke(
-			route,
-			req.method,
+		let route = req.baseUrl.replace(/^\/[^/]*\//, "");
+		//const result = await apiGw.invoke(
+		//	route,
+		//	req.method,
+		const result = await lambdas[route][req.method](
 			{headers: req.headers, body: req.body}	//event
 		);
 

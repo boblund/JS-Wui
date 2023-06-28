@@ -3,6 +3,9 @@
 
 'use strict';
 
+const {readdirSync, readFileSync} = require('fs');
+const path = require('path');
+
 const url = require('url'),
 	SourceIp = (() => {
 		const interfaces = require('os').networkInterfaces();
@@ -14,9 +17,14 @@ const url = require('url'),
 		return null;
 	})();
 
-function wsApiGw(httpServer, wsApi) {
-	const apiGw = new (require('./ApiGw'))(wsApi.routes),
-		mappingKey = wsApi.mappingKey || 'action';
+function wsApiGw(httpServer, apiPath) {
+	let lambdas={};
+
+	readdirSync(apiPath).forEach(route => {
+		lambdas[path.parse(route).name] = require(`${apiPath}/${route}`).handler;
+	});
+
+	const mappingKey = 'action';
 
 	// Create web socket server on top of a regular http server
 	const wsServer = require('ws').Server;
@@ -57,8 +65,9 @@ function wsApiGw(httpServer, wsApi) {
 
 	wss.on('connection', async(ws, req) => {
 		const connectionId = req.headers['sec-websocket-key'];
-		await apiGw.invoke(
-			'$connect', 'WEBSOCKET',
+		//await apiGw.invoke(
+		//	'$connect', 'WEBSOCKET',
+		await lambdas['onconnect'](
 			{ //event
 				requestContext: { routeKey: '$connect', connectionId: req.headers['sec-websocket-key'] },
 				headers: { ...req.headers, queryStringParameters: url.parse(req.url,true).query },
@@ -73,8 +82,9 @@ function wsApiGw(httpServer, wsApi) {
 		ws.on('close', async () => {
 			try {
 				delete clients[connectionId];
-				await apiGw.invoke(
-					'$disconnect', 'WEBSOCKET',
+				//await apiGw.invoke(
+				//	'$disconnect', 'WEBSOCKET',
+				await lambdas['ondisconnect'](
 					{ //event
 						requestContext: { routeKey: '$disconnect', connectionId: req.headers['sec-websocket-key'] },
 						headers: req.headers,
@@ -101,12 +111,13 @@ function wsApiGw(httpServer, wsApi) {
 				return;
 			}
 
-			routeKey = d[mappingKey] && wsApi.routes[d[mappingKey]] ? d[mappingKey] : '$default';
+			routeKey = d[mappingKey] ? d[mappingKey] : '$default';
 			try {
 				if(routeKey != '$default') {
-					await apiGw.invoke(
-						routeKey,
-						'WEBSOCKET',
+					//await apiGw.invoke(
+					//	routeKey,
+					//	'WEBSOCKET',
+					await lambdas[routeKey](
 						{	//event
 							requestContext: {routeKey, connectionId: req.headers['sec-websocket-key']},
 							headers: req.headers,

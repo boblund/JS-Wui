@@ -55,27 +55,28 @@ wsApi = {
 	}
 }'*/
 
-const {readFileSync, readdirSync} = require('fs');
+const {readFileSync, readdirSync} = require('fs'),
+	path = require('path');
 
-function apiGwLambdas(type, path){
+function apiGwLambdas(type, apiPath){
 	const apis={type, lambdas: {}};
 
 	switch(type){
 		case 'ws':
 			apis.mappingKey = "action";
-			readdirSync(path).forEach(route => {
-				//apis.lambdas[route] = readdirSync(path + '/' + route)[0];
-				apis.lambdas[route] = require(`${path}/${route}`)['handler'];
+			readdirSync(apiPath).forEach(route => {
+				//apis.lambdas[route] = readdirSync(apiPath + '/' + route)[0];
+				apis.lambdas[path.parse(route).name] = require(`${apiPath}/${route}`).handler;
 			});
 			return apis;
 
 		case 'rest':
-			readdirSync(path).forEach(route => {
-				const methods = readdirSync(path + '/' + route);
+			readdirSync(apiPath).forEach(route => {
+				const methods = readdirSync(apiPath + '/' + route);
 				apis.lambdas[route] = {};
 				for(const method of methods){
-					//apis.lambdas[route][method] = readdirSync(path + '/' + route + '/' + method)[0];
-					apis.lambdas[route][method] = require(`${path}/${route}/${method}`)['lambdaHandler'];
+					//apis.lambdas[route][method] = readdirSync(apiPath + '/' + route + '/' + method)[0];
+					apis.lambdas[route][path.parse(method).name] = require(`${apiPath}/${route}/${method}`)['lambdaHandler'];
 				}
 			});
 			return apis;
@@ -85,5 +86,9 @@ function apiGwLambdas(type, path){
 	}
 }
 
-console.log(JSON.stringify(apiGwLambdas('rest', '../new-restApi'), null, 2));
-console.log(JSON.stringify(apiGwLambdas('ws', '../new-wsApi'), null, 2));
+const rest = apiGwLambdas('rest', '../restApi');
+const ws = apiGwLambdas('ws', '../wsApi');
+
+rest.lambdas.apipath.GET('event', 'context');
+ws.lambdas.onconnect('event', 'context');
+
