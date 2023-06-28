@@ -21,7 +21,7 @@ process.on('SIGINT', ()=> {
 			[JSON.stringify({
 				title,
 				size,
-				url: `http://127.0.0.1:${serverPort}`,
+				url: `http://127.0.0.1:${serverPort}`,  //protocol needs to reflect https if used
 				debug: true
 			})],
 			{ silent: true });
