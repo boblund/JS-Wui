@@ -28,12 +28,12 @@ function listen(server) {
 let app = null;
 
 async function server(apis, https=false) {
-	const httpServer = (https
+	const httpServer = https
 		? require('https').createServer({
-			key: readFileSync(`${hostname()}.key`),
-			cert: readFileSync(`${hostname()}.cert`)
+			key: readFileSync(`${__dirname}/${hostname()}.key.pem`),
+			cert: readFileSync(`${__dirname}/${hostname()}.cert.pem`)
 		})
-		: require('http')).createServer();
+		: require('http').createServer();
 
 	for(let api in apis) {
 		switch(api) {

@@ -16,7 +16,8 @@
     "assets": [
       "web/*",
       "restApi/*.yaml",
-      "wsApi/*.yaml"
+      "wsApi/*.yaml",
+			"server/*.pem"
     ],
     "scripts": [
 			"./*.js",
