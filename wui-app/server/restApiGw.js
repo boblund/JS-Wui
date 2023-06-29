@@ -10,12 +10,12 @@ const {readdirSync, readFileSync} = require('fs');
 const path = require('path');
 
 function restApiGw(app, apiPath) {
-	let lambdas = {};
+	let handlers = {};
 	readdirSync(apiPath).forEach(route => {
 		const methods = readdirSync(apiPath + '/' + route);
-		lambdas[route] = {};
+		handlers[route] = {};
 		for(const method of methods){
-			lambdas[route][path.parse(method).name] = require(`${apiPath}/${route}/${method}`)['lambdaHandler'];
+			handlers[route][path.parse(method).name] = require(`${apiPath}/${route}/${method}`).handler;
 		}
 	});
 
@@ -38,7 +38,7 @@ function restApiGw(app, apiPath) {
 		//const result = await apiGw.invoke(
 		//	route,
 		//	req.method,
-		const result = await lambdas[route][req.method](
+		const result = await handlers[route][req.method](
 			{headers: req.headers, body: req.body}	//event
 		);
 

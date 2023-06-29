@@ -18,10 +18,10 @@ const url = require('url'),
 	})();
 
 function wsApiGw(httpServer, apiPath) {
-	let lambdas={};
+	let handlers={};
 
 	readdirSync(apiPath).forEach(route => {
-		lambdas[path.parse(route).name] = require(`${apiPath}/${route}`).handler;
+		handlers[path.parse(route).name] = require(`${apiPath}/${route}`).handler;
 	});
 
 	const mappingKey = 'action';
@@ -67,7 +67,7 @@ function wsApiGw(httpServer, apiPath) {
 		const connectionId = req.headers['sec-websocket-key'];
 		//await apiGw.invoke(
 		//	'$connect', 'WEBSOCKET',
-		await lambdas['onconnect'](
+		await handlers['onconnect'](
 			{ //event
 				requestContext: { routeKey: '$connect', connectionId: req.headers['sec-websocket-key'] },
 				headers: { ...req.headers, queryStringParameters: url.parse(req.url,true).query },
@@ -84,7 +84,7 @@ function wsApiGw(httpServer, apiPath) {
 				delete clients[connectionId];
 				//await apiGw.invoke(
 				//	'$disconnect', 'WEBSOCKET',
-				await lambdas['ondisconnect'](
+				await handlers['ondisconnect'](
 					{ //event
 						requestContext: { routeKey: '$disconnect', connectionId: req.headers['sec-websocket-key'] },
 						headers: req.headers,
@@ -117,7 +117,7 @@ function wsApiGw(httpServer, apiPath) {
 					//await apiGw.invoke(
 					//	routeKey,
 					//	'WEBSOCKET',
-					await lambdas[routeKey](
+					await handlers[routeKey](
 						{	//event
 							requestContext: {routeKey, connectionId: req.headers['sec-websocket-key']},
 							headers: req.headers,
