@@ -3,7 +3,7 @@
 
 'use strict';
 
-const {readdirSync, readFileSync} = require('fs');
+const {readdirSync} = require('fs');
 const path = require('path');
 
 const url = require('url'),
@@ -65,8 +65,6 @@ function wsApiGw(httpServer, apiPath) {
 
 	wss.on('connection', async(ws, req) => {
 		const connectionId = req.headers['sec-websocket-key'];
-		//await apiGw.invoke(
-		//	'$connect', 'WEBSOCKET',
 		await handlers['onconnect'](
 			{ //event
 				requestContext: { routeKey: '$connect', connectionId: req.headers['sec-websocket-key'] },
@@ -82,8 +80,6 @@ function wsApiGw(httpServer, apiPath) {
 		ws.on('close', async () => {
 			try {
 				delete clients[connectionId];
-				//await apiGw.invoke(
-				//	'$disconnect', 'WEBSOCKET',
 				await handlers['ondisconnect'](
 					{ //event
 						requestContext: { routeKey: '$disconnect', connectionId: req.headers['sec-websocket-key'] },
@@ -114,9 +110,6 @@ function wsApiGw(httpServer, apiPath) {
 			routeKey = d[mappingKey] ? d[mappingKey] : '$default';
 			try {
 				if(routeKey != '$default') {
-					//await apiGw.invoke(
-					//	routeKey,
-					//	'WEBSOCKET',
 					await handlers[routeKey](
 						{	//event
 							requestContext: {routeKey, connectionId: req.headers['sec-websocket-key']},
