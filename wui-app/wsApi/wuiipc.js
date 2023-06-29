@@ -8,9 +8,9 @@ exports.handler = async (event, context) => {
 	const {data} = JSON.parse(event.body);
 
 	await delay((Math.random() * 1000) * .25 ); // 0 to last multiplier seconds;
-	await context.clientContext.getConnection({ConnectionId: global.connectionId});
+	//await context.clientContext.getConnection({ConnectionId: global.connectionId});
 	await context.clientContext.postToConnection({
-		ConnectionId: global.connectionId,
+		ConnectionId: event.requestContext.connectionId, //global.connectionId,
 		Data: JSON.stringify({
 			id: data.id,
 			msg: {

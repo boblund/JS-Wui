@@ -3,6 +3,6 @@
 "use strict";
 
 exports.handler = (event, context) => {
-	delete global.connectionId;
+	//delete global.connectionId;
 	return { statusCode: 200, body: 'success' };
 };
