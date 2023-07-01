@@ -1,21 +1,10 @@
 // License: Creative Commons Attribution-NonCommercial 4.0 International
-// Based on https://github.com/JamesKyburz/aws-lambda-ws-server
 
 'use strict';
 
 const {readdirSync} = require('fs');
 const path = require('path');
-
-const url = require('url'),
-	SourceIp = (() => {
-		const interfaces = require('os').networkInterfaces();
-		for(const iface of Object.keys(interfaces)){
-			for(const e of interfaces[iface]) {
-				if(e.family == 'IPv4' && !(e.internal)) return e.address;
-			}
-		}
-		return null;
-	})();
+const url = require('url');
 
 function wsApiGw(httpServer, apiPath) {
 	let handlers={};
@@ -24,101 +13,53 @@ function wsApiGw(httpServer, apiPath) {
 		handlers[path.parse(route).name] = require(`${apiPath}/${route}`).handler;
 	});
 
-	const mappingKey = 'action';
-
 	// Create web socket server on top of a regular http server
 	const wsServer = require('ws').Server;
 	const wss = new wsServer({ server: httpServer });
 	const clients = {};
 
-	// Local equivalent of AWS.ApiGatewayManagementApi functions. Add deleteConnection if required.
-	const clientContext = {
-		postToConnection ({Data, ConnectionId}) {
-			return new Promise((resolve, reject) => {
-				const ws = clients[ConnectionId];
-				if (ws) {
-					ws.send(Data, err => {
-						(err ? reject(err) : resolve());
-					});
-				} else {
-					const err = new Error('Unknown client:', ConnectionId);
-					err.statusCode = 410;
-					reject(err);
-				}
-			});
-		},
-
-		getConnection({ConnectionId}) {
-			return new Promise((resolve, reject) => {
-				if(clients[ConnectionId]) {
-					resolve({
-						"ConnectedAt": new Date,
-						"Identity": { SourceIp, "UserAgent": null },
-						"LastActiveAt": new Date()
-					});
-				} else {
-					reject({code: 'GoneException', message: 410});
-				}
-			});
-		}
-	};
-
-	wss.on('connection', async(ws, req) => {
+	wss.on('connection', async (ws, req) => {
 		const connectionId = req.headers['sec-websocket-key'];
-		await handlers['onconnect'](
-			{ //event
-				requestContext: { routeKey: '$connect', connectionId: req.headers['sec-websocket-key'] },
-				headers: { ...req.headers, queryStringParameters: url.parse(req.url,true).query },
-				body: req.body
-			},
-			{ clientContext } //context
-		);
-		clients[connectionId] = ws;
+		let r = await handlers['onconnect']({ //event
+			headers: { ...req.headers, queryStringParameters: url.parse(req.url,true).query }
+		});
 
-		ws.on('ping', d => {console.log(`ping ${d}`);});
+		if(r.statusCode != 200){
+			ws.close(1011, r.body);
+			return;
+		}
+
+		clients[connectionId] = ws;
 
 		ws.on('close', async () => {
 			try {
 				delete clients[connectionId];
-				await handlers['ondisconnect'](
-					{ //event
-						requestContext: { routeKey: '$disconnect', connectionId: req.headers['sec-websocket-key'] },
-						headers: req.headers,
-						body: req.body
-					}
-				);				
+				await handlers['ondisconnect']();				
 			} catch (e) {
 				console.error(e);
 			}
 		});
 
 		ws.on('message', async message => {
-			let routeKey = null;
-			let d = null;
+			let id = null, msg = null, route = null;
 
 			try {
-				d = JSON.parse(message);
+				({data: {id}, data: {msg}, route} = JSON.parse(message));
 			} catch(e) {
 				console.error('ws.on messgage error:', e.code, e.message);
-				await clientContext.postToConnection({
-					Data: JSON.stringify({ error: 'Invalid JSON:' + message }),
-					ConnectionId: connectionId
-				});
+				await clients[connectionId].send(JSON.stringify({
+					msg: { error: 'Invalid JSON:' + message },
+					id: null
+				}));
 				return;
 			}
 
-			routeKey = d[mappingKey] ? d[mappingKey] : '$default';
 			try {
-				if(routeKey != '$default') {
-					await handlers[routeKey](
-						{	//event
-							requestContext: {routeKey, connectionId: req.headers['sec-websocket-key']},
-							headers: req.headers,
-							body: message.toString()
-						},
-						{ clientContext }	//context
-					);
-				}        
+				await handlers[route]( msg, (msg) => {
+					return new Promise((res, rej) => {
+						clients[connectionId].send( JSON.stringify({id, msg}), err => {err ? rej(err) : res();} );
+					});
+				});       
 			} catch (e) {
 				console.error('ws server error:', e.statusCode, e.body);
 			}

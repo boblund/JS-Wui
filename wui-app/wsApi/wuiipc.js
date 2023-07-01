@@ -4,21 +4,9 @@ function delay( msec ) {
 	} );
 }
 
-exports.handler = async (event, context) => {
-	const {data} = JSON.parse(event.body);
-
+exports.handler = async (msg, cb) => {
 	await delay((Math.random() * 1000) * .25 ); // 0 to last multiplier seconds;
-	//await context.clientContext.getConnection({ConnectionId: global.connectionId});
-	await context.clientContext.postToConnection({
-		ConnectionId: event.requestContext.connectionId, //global.connectionId,
-		Data: JSON.stringify({
-			id: data.id,
-			msg: {
-				type: 'someNodeFunctionResp',
-				value: 'response'
-			}
-		})
-	});
-
-	return { statusCode: 200, body: 'success' };
+	msg.type += ' resp';
+	msg.value += ' resp';
+	await cb(msg);
 };
