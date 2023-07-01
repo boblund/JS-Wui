@@ -1,3 +1,6 @@
+// Integrated local static web and rest/ws api server.
+// Based on https://stackoverflow.com/a/34838031/6996491.
+
 #include <napi.h>
 #include <string>
 #include <iostream>

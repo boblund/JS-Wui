@@ -1,11 +1,12 @@
 #!/usr/bin/env node
 
-'use strict';
-
 // License: Creative Commons Attribution-NonCommercial 4.0 International
+// THIS SOFTWARE COMES WITHOUT ANY WARRANTY, TO THE EXTENT PERMITTED BY APPLICABLE LAW.
 
-// Integrated local AWS s3 static web and rest/ws api server.
+// Integrated local static web and rest/ws api server.
 // Based on https://stackoverflow.com/a/34838031/6996491.
+
+'use strict';
 
 const { readFileSync, existsSync } = require('fs'),
 	{ hostname } = require('os'),
