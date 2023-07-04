@@ -189,7 +189,7 @@ npm install
 node wuiApp.js
 ```
 
-An executable version of the wuiApp.js can be made with [pkg](https://www.npmjs.com/package/pkg). In the wui-app directory, The ```package.json``` property ```name``` will be your executable name. The ```targets``` property will be the executable versions built. Then run:
+An executable version of the wuiApp.js can be made with [pkg](https://www.npmjs.com/package/pkg). The ```package.json``` property ```name``` in the wui-app directory will be your executable name. The ```targets``` property will be the executable versions built. Then run:
 
 ```
 pkg .
