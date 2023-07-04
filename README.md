@@ -122,20 +122,18 @@ const resp = Wui.writeFile(filePath, 'some data');
 
 This interface enables a sender in the webview to send a message over a websocket to a backend NodeJS handler. 
 
-```Wui.send(route<String>, msg<Object> [, callback<Function>])<Promise>```
+```Wui.send(route<String>, msg<Object> [, callback<Function>])<Promise> | null```
 
 Messages with a given ```route``` are sent to the backend handler for that route. If ```callback``` is omitted, returns a Promise otherwise returns ```null```.
 
-Each ```msg``` is sent with a unique ID to the backend handler. This ID must be included in the response from the backend and is used to invoke the corresponding ```callback``` or resolve the ```Promise```. The ```callback``` is called with arguemnts ```error``` (either ```true``` or ```false```) and ```resp``` which is an ```Object```. The Promise is resolved or rejected with a ```resp```.
-
-Wui defines the route ```wuiipc``` handler [REF]. Handlers for other routes can be defined.
+Each sent ```msg``` invokes an instance of the backend handler for the specified route. This handler's response  invokes the corresponding ```callback``` or resolves the ```Promise``` with a response .
 
 ```
-const resp = await Wui.send('wuiipc, aJSObject);
+const resp = await Wui.send('wuiipc, {aMessage});
 .
 .
 .
-Wui.send('wuiipc', (err, msg) => {
+Wui.send('wuiipc', {aMessage}, resp => {
 	//Do something
 })
 ```
