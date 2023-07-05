@@ -15,13 +15,11 @@
   "pkg": {
     "assets": [
       "web/*",
-      "restApi/*.yaml",
-      "wsApi/*.yaml",
-			"server/*.pem"
+      "server/*.pem"
     ],
     "scripts": [
-			"./*.js",
-			"web/*.js",
+      "./*.js",
+      "web/*.js",
       "restApi/**/*.js",
       "wsApi/**/*.js"
     ],
@@ -32,10 +30,6 @@
   },
   "dependencies": {
     "cors": "^2.8.5",
-    "js-yaml": "^4.1.0",
-    "minimist": "^1.2.6",
-    "ws": "^8.8.1",
-    "yaml-cfn": "^0.3.1",
-    "yamljs": "^0.3.0"
+    "ws": "^8.8.1"
   }
 }

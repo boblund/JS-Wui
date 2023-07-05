@@ -1,14 +1,21 @@
 # JS-Wui
 
-JS-Wui (JavaScript Webview user interface) is used to create standalone cross-platform apps for macos, linux and windows. Apps are written as web apps using HTML, CSS, JavaScript and Nodejs. The user interface is displayed using [webview](https://github.com/webview/webview). Webview JavaScript bindings expose [Portable File Dialogs](https://github.com/samhocevar/portable-file-dialogs) for file/directory selection, messages and notifications. A Node C++ addon provides JavaScript bindings for file read and write. A websocket-based IPC allows the webview app to invoke NodeJS functions. A deployed app executable can be created with [pkg](https://www.npmjs.com/package/pkg).
+JS-Wui (JavaScript Webview user interface) is used to create standalone cross-platform apps for macos, linux and windows. Apps are written using a serverless-model: static web pages, and REST and websocket interfaces. The frontend is [webview](https://github.com/webview/webview) augmented with JS-Wui bindings for:
+
+- [Portable File Dialogs](https://github.com/samhocevar/portable-file-dialogs) for file/directory selection, messages and notifications.
+- A Node C++ addon for file read and write.
+- A websocket-based IPC allows the webview app to invoke NodeJS functions.
+- Invoking modular backend REST functions.
+
+The backend is a NodeJS/Express web server. New backend functions that implement REST and websocket interfaces can easily be added by implementing handler functions that are disovered by the backend when it starts.
+
+A deployed app executable can be created with [pkg](https://www.npmjs.com/package/pkg).
 
 [Architecture](#architecture)
 
 [Wui Interface](#wui)
 
 [Using the example](#using)
-
-[Building you app](#building)
 
 [License](#license)
 
@@ -20,12 +27,12 @@ A wui app consists of a standard template that:
 - Starts a local web server on some unused port.
 - Forks a process that launches a Webview aimed at the server's address (http://127.0.0.1:port).
 
-The server web app component directories are specified in ```appConfig.js``` which defaults to:
+The web app server component directories are specified in ```appConfig.js``` which defaults to:
 - ./web: index.html and all referenced JavaScript and CSS files.
-- ./restApi: An API template and directories that implement each REST API. The implementation uses the Amazon Web Services (AWS) serverless application ([SAM](https://aws.amazon.com/serverless/sam/)) model. The template defines information about each API. Each API directory includes an ```app.js``` file that is the entry point for the API logic.
-- ./wsApu: same as ./restApi except for websockets.
 
-The SAM serverless lambda model provides a flexible, modular way to implement APIs. In SAM, lambdas have no persistant data and run in independent contexts. In a wui app, the lambdas are loaded via ```require``` into the same process and can use any nodejs data store or sharing method, e.g. ```global```.
+- ./restApi: Contains directories that implement each REST API. Each REST interface is a directory which contains handlers for each method available on that intefaces. A handler is called with an object ```{event: headers: http_request_headers, body: http_request_body}```. The example defines the REST api ```apipath``` that implements ```GET```.
+
+- ./wsApi: A websocket is used to implement IPC between the frontend and backend. This directory contains handlers that implement IPC routes. There are two default routes (```onconnect``` and ```ondisconnect```) whose handlers are called when the websocket is opened and closed, respectively. Other routes are user-defined IPCs. The example defines the route ```wuiipc``` and shows the handlers for ```onconnect```, ```ondisconnect``` and ```wuiipc```.
 
 # Webview Interface <a name="webview"></a>
 
@@ -45,7 +52,7 @@ webview.start({
 
 ```start``` also causes a ```Wui``` global object to be created in the webview. This object has methods for functions available in browsers but not in the core webview.
 
-# JS-Wui Interface <a name="wui"></a>
+# Wui Interface <a name="wui"></a>
 
 ## Portable File Dialogs
 
@@ -115,20 +122,18 @@ const resp = Wui.writeFile(filePath, 'some data');
 
 This interface enables a sender in the webview to send a message over a websocket to a backend NodeJS handler. 
 
-```Wui.send(route<String>, msg<Object> [, callback<Function>])<Promise>```
+```Wui.send(route<String>, msg<Object> [, callback<Function>])<Promise> | null```
 
-Messages with a given ```route``` are sent to the backend handler for that route ([REF]). If ```callback``` is omitted, returns a Promise otherwise returns ```null```.
+Messages with a given ```route``` are sent to the backend handler for that route. If ```callback``` is omitted, returns a Promise otherwise returns ```null```.
 
-Each ```msg``` is sent with a unique ID to the backend handler. This ID must be included in the response from the backend and is used to invoke the corresponding ```callback``` or resolve the ```Promise```. The ```callback``` is called with arguemnts ```error``` (either ```true``` or ```false```) and ```resp``` which is an ```Object```. The Promise is resolved or rejected with a ```resp```.
-
-Wui defines the route ```wuiipc``` handler [REF]. Handlers for other routes can be defined.
+Each sent ```msg``` invokes an instance of the backend handler for the specified route. This handler's response  invokes the corresponding ```callback``` or resolves the ```Promise``` with a response .
 
 ```
-const resp = await Wui.send('wuiipc, aJSObject);
+const resp = await Wui.send('wuiipc, {aMessage});
 .
 .
 .
-Wui.send('wuiipc', (err, msg) => {
+Wui.send('wuiipc', {aMessage}, resp => {
 	//Do something
 })
 ```
@@ -182,45 +187,13 @@ npm install
 node wuiApp.js
 ```
 
-An executable version of the wuiApp.js can be made with [pkg](https://www.npmjs.com/package/pkg). In the wui-app directory, The ```package.json``` property ```name``` will be your executable name. The ```targets``` property will be the executable versions built. Then run:
+An executable version of the wuiApp.js can be made with [pkg](https://www.npmjs.com/package/pkg). The ```package.json``` property ```name``` in the wui-app directory will be your executable name. The ```targets``` property will be the executable versions built. Then run:
 
 ```
 pkg .
 ```
 
 This will leave executable files in the ```dist``` directory.
-
-# Building you app <a name="building"></a>
-
-A JS-wui app is essentially a web site consisting of static web pages, REST interfaces and a Websocket interface. An app is organized as follows:
-```
-JS-Wui/
-|--- webview/    								
-|--- wui-app/
-|    |--- web/
-|    |--- restApi/
-|         |--- apidir/
-|         |--- template.yaml
-|    |--- wsApi/
-|         |--- apidir/
-|         |--- template.yaml
-|    |--- appConfig.js
-|    |--- addon_webview.node
-```
-
-- webview/ contains the webview C++ addon, that does not need to be changed.
-- wui-app/appConfig.js defines where the webpages, and REST and Websocket Interfaces are located.
-- wui-app/web, restAPI, wsAPI contain the directories for web pages, REST interfaces and the Websocket interface for the sample app.
-
-The entry point for the app must be named ```index.html```. The names and structure of the other components are up to the app developer.
-
-The optional REST and Websocket interfaces use the Amazon Web Services (AWS) serverless application ([SAM](https://aws.amazon.com/serverless/sam/)) model which defines information about each interface.
-
-The REST and Webscoket intefaces are described in ```template.yaml``` that defines the set of interface handlers:
-		- ```CodeUri``` is the relative path to access handler
-		- ```Handler``` is the handler function file name minus the extenstion'.
-
-Each interface handler is in a sub-directory ```CodeUri```. The subdirectory contains the hander logic ```app.js``` that exports a function, e.g. ```app.lambdaHandler```.
 
 # License <a name="license"></a>
 

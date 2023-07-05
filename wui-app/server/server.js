@@ -1,18 +1,18 @@
 #!/usr/bin/env node
 
-'use strict';
-
 // License: Creative Commons Attribution-NonCommercial 4.0 International
+// THIS SOFTWARE COMES WITHOUT ANY WARRANTY, TO THE EXTENT PERMITTED BY APPLICABLE LAW.
 
-// Integrated local AWS s3 static web and rest/ws api server.
+// Integrated local static web and rest/ws api server.
 // Based on https://stackoverflow.com/a/34838031/6996491.
+
+'use strict';
 
 const { readFileSync, existsSync } = require('fs'),
 	{ hostname } = require('os'),
 	express = require('express'),
 	restApiGw = require('./restApiGw.js'),
-	wsApiGw = require('./wsApiGw.js'),
-	apiGwLambdas = require('./apiGwLambdas.js');
+	wsApiGw = require('./wsApiGw.js');
 
 const portRange = [ 10000, 60000 ];
 function generatePort() {return (Math.floor(Math.random() * (portRange[1] - portRange[0] + 1)) + portRange[0]);}
@@ -49,24 +49,11 @@ async function server(apis, https=false) {
 
 			case 'rest':
 				app = app ? app : express(); //app if necessary
-				const {restApi} = await apiGwLambdas(apis.rest);
-				if(restApi && Object.keys(restApi).length > 0) {
-					restApiGw(app, restApi);
-				} else {
-					console.error(`${process.argv[1].split('/').pop()}: no restApi`);
-					process.exit(1);
-				}
+				restApiGw(app, apis.rest.filesPath);
 				break;
 
 			case 'ws':
-				if(!apis?.ws) break;
-				const {wsApi} = await apiGwLambdas(apis.ws);
-				if(wsApi && Object.keys(wsApi.routes).length > 0) {
-					wsApiGw(httpServer, wsApi);
-				} else {
-					console.error(`${process.argv[1].split('/').pop()}: no wsApi`);
-					process.exit(1);
-				}
+				wsApiGw(httpServer, apis.ws.filesPath);
 				break;
 		}
 	}

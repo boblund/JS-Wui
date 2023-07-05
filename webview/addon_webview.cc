@@ -1,3 +1,6 @@
+// Integrated local static web and rest/ws api server.
+// Based on https://stackoverflow.com/a/34838031/6996491.
+
 #include <napi.h>
 #include <string>
 #include <iostream>
@@ -126,12 +129,15 @@ void Start(const Napi::CallbackInfo& info) {
 		delete notify;
 
 		let maxQueueLength = 0,
-			ipcQueue = {},
-			wuiIpcKeys=[],
+			ipcQueue = {}
 			websocket = new WebSocket(`ws://${window.location.host}`);
 
 		Wui.sendIpc = (type, msg, cb=null) => {
-			const id = btoa(Math.random().toString()).slice(3);
+			let id = null;
+			while(true) {
+				id = btoa(Math.random().toString()).slice(3);
+				if(ipcQueue[id] == undefined) break;
+			}
 			let rVal = null;
 			if( cb != null ) {
 				ipcQueue[id] = cb;
@@ -144,7 +150,7 @@ void Start(const Napi::CallbackInfo& info) {
 			}
 		
 			websocket.send(JSON.stringify({
-				action: type,
+				route: type,
 				data: {id, msg}
 			}));
 		
@@ -152,22 +158,19 @@ void Start(const Napi::CallbackInfo& info) {
 		};
 
 		websocket.onmessage = wsMsg => {
-			let id, msg;
-		
 			try {
-				({id, msg} = JSON.parse( wsMsg.data ));
-				let error = false;
-		
-				if(ipcQueue[id] != 'undefined') {
-					ipcQueue[id](error, msg);
-					delete ipcQueue[ id ];
-				} else {
-					console.error(`error: ipcQueue[${id}] undefined`);
-				}
+				const {id, msg} = JSON.parse( wsMsg.data );
+				ipcQueue[id](false, msg); // error always false as of now
+				delete ipcQueue[ id ];
 			} catch( e ) {
-				console.error( `callback error: ${ e }` );
+				console.error( `websocket.onmessage error: ${ e }` );
 			}
 		};
+
+		websocket.addEventListener("close", (event) => {
+			console.log(`WebSocket close: code ${event.code} reason ${event.reason}`);
+		});
+
 	)"""");
 
 	w.run();
