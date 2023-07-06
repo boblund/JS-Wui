@@ -122,17 +122,17 @@ const resp = Wui.writeFile(filePath, 'some data');
 
 These interfaces enable sending and receiving messages over a websocket between webview and backend NodeJS handlers.
 
-### Webview Inteface
+### Webview Interface
 
 ```Wui.send(route<String>, msg<Object>)```
 
-Sends ```msg``` to the hanlder for```route```.
+Sends ```msg``` to the handler for```route```.
 
 ```Wui.on(route<String>, cb<Function>)<Boolean>```
 
 Calls ```cb``` with a message argument when a  message on ```route``` is received. Returns ```false``` if the underlying websocket is closed otherwise ```true```.
 
-### Route Handler Inteface
+### Route Handler Interface
 
 ```Wui.send(msg<Object>)```
 
@@ -145,15 +145,15 @@ Calls ```cb``` with a message argument when a  message is received.
 ```
 // handler route1.js
 exports.handler = ws => {
-	ws.onmessage(msg => {
-		let resp = //do something with msg
-		ws.send(resp);
-	})
+  ws.onmessage(msg => {
+    let resp = //do something with msg
+    ws.send(resp);
+  })
 }
 
 // webview
 Wui.on('route1', msg => {
-	//do something with msg
+  //do something with msg
 })
 
 Wui.send('route1', msg);
