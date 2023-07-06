@@ -7,9 +7,14 @@ function delay( msec ) {
 	} );
 }
 
-exports.handler = async (msg, cb) => {
-	await delay((Math.random() * 1000) * .25 ); // 0 to last multiplier seconds;
-	msg.type += ' resp';
-	msg.value += ' resp';
-	await cb(msg);
+exports.handler = async (ws) => {
+	let cnt = 0;
+	await delay(3); // wait for Webview to start
+	ws.send({type: 'server', value: 'start'});
+	ws.onmessage(async msg => {
+		msg.type += ' resp';
+		msg.value += ` resp ${cnt++}`;
+		await delay((Math.random() * 1000) * .25 ); // 0 to last multiplier seconds;
+		ws.send(msg);
+	});
 };

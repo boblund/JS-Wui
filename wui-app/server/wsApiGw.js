@@ -1,3 +1,4 @@
+
 // License: Creative Commons Attribution-NonCommercial 4.0 International
 // THIS SOFTWARE COMES WITHOUT ANY WARRANTY, TO THE EXTENT PERMITTED BY APPLICABLE LAW.
 
@@ -5,7 +6,6 @@
 
 const {readdirSync} = require('fs');
 const path = require('path');
-const url = require('url');
 
 function wsApiGw(httpServer, apiPath) {
 	let handlers={};
@@ -17,53 +17,37 @@ function wsApiGw(httpServer, apiPath) {
 	// Create web socket server on top of a regular http server
 	const wsServer = require('ws').Server;
 	const wss = new wsServer({ server: httpServer });
-	const clients = {};
 
-	wss.on('connection', async (ws, req) => {
-		const connectionId = req.headers['sec-websocket-key'];
-		let r = await handlers['onconnect']({ //event
-			headers: { ...req.headers, queryStringParameters: url.parse(req.url,true).query }
+	wss.on('connection', (ws, req) => {
+		const routeCbs = {};
+
+		Object.keys(handlers).forEach(route => {
+			handlers[route]({
+				send(msg) { ws.send(JSON.stringify({route, msg})); },
+				onmessage(cb) { routeCbs[route] = cb; }
+			});
 		});
 
-		if(r.statusCode != 200){
-			ws.close(1011, r.body);
-			return;
-		}
-
-		clients[connectionId] = ws;
-
-		ws.on('close', async () => {
-			try {
-				delete clients[connectionId];
-				await handlers['ondisconnect']();				
-			} catch (e) {
-				console.error(e);
-			}
+		ws.on('close', () => {
+			Object.keys(routeCbs).forEach(route => {delete routeCbs[route];});
+			Object.keys(handlers).forEach(route => {delete handlers[route];});
 		});
 
-		ws.on('message', async message => {
-			let id = null, msg = null, route = null;
+		ws.on('message', message => {
+			let msg = null, route = null;
 
 			try {
-				({data: {id}, data: {msg}, route} = JSON.parse(message));
+				({route, msg} = JSON.parse(message));
 			} catch(e) {
 				console.error('ws.on messgage error:', e.code, e.message);
-				await clients[connectionId].send(JSON.stringify({
+				ws.send(JSON.stringify({
 					msg: { error: 'Invalid JSON:' + message },
-					id: null
+					route: null
 				}));
 				return;
 			}
 
-			try {
-				await handlers[route]( msg, (msg) => {
-					return new Promise((res, rej) => {
-						clients[connectionId].send( JSON.stringify({id, msg}), err => {err ? rej(err) : res();} );
-					});
-				});       
-			} catch (e) {
-				console.error('ws server error:', e.statusCode, e.body);
-			}
+			routeCbs[route](msg);
 		});
 	});
 }
