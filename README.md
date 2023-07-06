@@ -58,7 +58,7 @@ webview.start({
 
 The following ```Wui``` methods expose [Portable File Dialogs](https://github.com/samhocevar/portable-file-dialogs/tree/main) which provides native file and message dialogs.
 
-### Wui.message(title\<String\>, msg\<String\>, msgType\<String\>)\<String\>
+#### Wui.message(title\<String\>, msg\<String\>, msgType\<String\>)\<String\>
 
 Display ```msg``` with ```title``` and icon ```msgType```. Returns the message pressed button. ```msgType``` can be "info", "question" or "warning". The pressed button can be: "yes", "no", "cancel", "ok", "abort", "retry" or "ignore".
 
