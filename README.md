@@ -3,8 +3,8 @@
 JS-Wui (JavaScript Webview user interface) is used to create standalone cross-platform apps for macos, linux and windows. Apps are written using a serverless-model: static web pages, and REST and websocket interfaces. The frontend is [webview](https://github.com/webview/webview) augmented with JS-Wui bindings for:
 
 - [Portable File Dialogs](https://github.com/samhocevar/portable-file-dialogs) for file/directory selection, messages and notifications.
-- A Node C++ addon for file read and write.
-- A websocket-based IPC allows the webview app to invoke NodeJS functions.
+- Node C++ addon for file read and write.
+- Websocket-based IPC allows the webview app to communicate with backend NodeJS functions.
 - Invoking modular backend REST functions.
 
 The backend is a NodeJS/Express web server. New backend functions that implement REST and websocket interfaces can easily be added by implementing handler functions that are disovered by the backend when it starts.
