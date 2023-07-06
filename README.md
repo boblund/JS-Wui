@@ -48,9 +48,11 @@ webview.start({
 });
 ```
 
-```webview.start``` creates and starts a new webview with the specified parameters. See [webview](https://github.com/webview/webview) for details of the ```start``` parameters.
+### webview.start()
 
-```start``` also causes a ```Wui``` global object to be created in the webview. This object has methods for functions available in browsers but not in the core webview.
+Creates and starts a new webview with the specified parameters. See [webview](https://github.com/webview/webview) for details of the ```start``` parameters.
+
+It also causes a ```Wui``` global object to be created in the webview. This object has methods for functions available in browsers but not in the core webview.
 
 # Wui Interface <a name="wui"></a>
 
@@ -58,7 +60,7 @@ webview.start({
 
 The following ```Wui``` methods expose [Portable File Dialogs](https://github.com/samhocevar/portable-file-dialogs/tree/main) which provides native file and message dialogs.
 
-#### Wui.message(title\<String\>, msg\<String\>, msgType\<String\>)\<String\>
+### Wui.message(title\<String\>, msg\<String\>, msgType\<String\>)\<String\>
 
 Display ```msg``` with ```title``` and icon ```msgType```. Returns the message pressed button. ```msgType``` can be "info", "question" or "warning". The pressed button can be: "yes", "no", "cancel", "ok", "abort", "retry" or "ignore".
 
@@ -66,7 +68,7 @@ Display ```msg``` with ```title``` and icon ```msgType```. Returns the message p
 const button = Wui.message('Message title', 'message text', 'info');
 ```
 
-#### Wui.notify(title\<String\>, msg\<String\>, msgType\<String\>)\<String\>```
+### Wui.notify(title\<String\>, msg\<String\>, msgType\<String\>)\<String\>```
 
 Display ```msg``` with ```title``` and icon ```msgType```. Returns "done". ```msgType``` can be "info", "question" or "warning".
 
@@ -74,7 +76,7 @@ Display ```msg``` with ```title``` and icon ```msgType```. Returns "done". ```ms
 const resp = Wui.notify('Message title', 'message text', 'info');
 ```
 
-#### Wui.readFileDialog()\<Object\>
+### Wui.readFileDialog()\<Object\>
 
 Display a dialog for the user to select a file. Returns ```{path: filePath}``` where ```filePath``` is the absolute path to the file.
 
@@ -82,7 +84,7 @@ Display a dialog for the user to select a file. Returns ```{path: filePath}``` w
 const {path} = Wui.readFileDialog();
 ```
 
-#### Wui.selectFolder()\<Object\>
+### Wui.selectFolder()\<Object\>
 
 Display a dialog for the user to select a folder. Returns ```{path: folderPath}``` where ```folderPath``` is the absolute path to the folder.
 
@@ -90,7 +92,7 @@ Display a dialog for the user to select a folder. Returns ```{path: folderPath}`
 const {path} = Wui.selectFolder();
 ```
 
-#### Wui.writeFileDialog(defaultFileName\<String\>)\<Object\>
+### Wui.writeFileDialog(defaultFileName\<String\>)\<Object\>
 
 Display a dialog for the user to select a file to write to; defaults to  ```defaultFileName```. Returns ```{path: filePath}``` where ```filePath``` is the absolute path to the file.
 
@@ -110,7 +112,7 @@ Read the file ```filePath```. Returns ```{data: fileContents}``` where ```fileCo
 const {data} = Wui.readFile(filePath);
 ```
 
-#### Wui.writeFile(filePath\<String\>, data\<String\>)\<Object\>
+### Wui.writeFile(filePath\<String\>, data\<String\>)\<Object\>
 
 Writes ```data``` to the file ```filePath```. Returns "done".
 
@@ -124,21 +126,21 @@ These interfaces enable sending and receiving messages over a websocket between 
 
 ### Webview Interface
 
-```Wui.send(route<String>, msg<Object>)```
+#### Wui.send(route\<String\>, msg\<Object\>)
 
 Sends ```msg``` to the handler for```route```.
 
-```Wui.on(route<String>, cb<Function>)<Boolean>```
+#### Wui.on(route\<String\>, cb\<Function\>)\<Boolean\>
 
 Calls ```cb``` with a message argument when a  message on ```route``` is received. Returns ```false``` if the underlying websocket is closed otherwise ```true```.
 
 ### Route Handler Interface
 
-```Wui.send(msg<Object>)```
+#### Wui.send(msg\<Object\>)
 
 Sends ```msg``` on this handler's IPC.
 
-```Wui.onmessage(cb<Function>)```
+#### Wui.onmessage(cb\<Function\>)
 
 Calls ```cb``` with a message argument when a  message is received.
 
