@@ -120,7 +120,7 @@ const resp = Wui.writeFile(filePath, 'some data');
 
 ## IPC
 
-This interface enables a sender in the webview to send and receive messages over a websocket with a backend NodeJS handler.
+These interfaces enable sending and receiving messages over a websocket between webview and backend NodeJS handlers.
 
 ### Webview Inteface
 
@@ -130,7 +130,7 @@ Sends ```msg``` to the hanlder for```route```.
 
 ```Wui.on(route<String>, cb<Function>)<Boolean>```
 
-Use ```cb``` with a message argument when a  message on ```route``` is received. Returns ```false``` if the underlying websocket is closed otherwise ```true```.
+Calls ```cb``` with a message argument when a  message on ```route``` is received. Returns ```false``` if the underlying websocket is closed otherwise ```true```.
 
 ### Route Handler Inteface
 
