@@ -128,9 +128,9 @@ This interface enables a sender in the webview to send and receive messages over
 
 Sends ```msg``` to the hanlder for```route```.
 
-```Wui.on(route<String>, cb<Function>)```
+```Wui.on(route<String>, cb<Function>)<Boolean>```
 
-Calls ```cb``` with a message argument when a  message on ```route``` is received.
+Use ```cb``` with a message argument when a  message on ```route``` is received. Returns ```false``` if the underlying websocket is closed otherwise ```true```.
 
 ### Route Handler Inteface
 
