@@ -30,7 +30,7 @@ A wui app consists of a standard template that:
 The web app server component directories are specified in ```appConfig.js``` which defaults to:
 - ./web: index.html and all referenced JavaScript and CSS files.
 
-- ./restApi: Contains directories that implement each REST API. Each REST interface is a directory which contains handlers for each method available on that intefaces. A handler is called with an object ```{event: headers: http_request_headers, body: http_request_body}```. The example defines the REST api ```apipath``` that implements ```GET```.
+- ./restApi: Contains directories that implement each REST API. Each REST interface is a directory which contains handlers for each method available on that intefaces. A handler is called with an object ```{headers: http_request_headers, body: http_request_body}```. The example defines the REST api ```apipath``` that implements ```GET```.
 
 - ./wsApi: A websocket is used to implement IPC between the frontend webview and backend handlers. IPC routes, e.g. ```route1```, between the webview and their handlers are multiplexed onto a websocket. This directory contains IPC routes handlers that are named for their route, e.g. ```route1.js``` for ```route1```
 
