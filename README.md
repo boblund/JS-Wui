@@ -41,10 +41,10 @@ The webview interface is exposed by a NodeJS C++ addon.
 ```
 const webview = require('./addon_webview.node')
 webview.start({
-	title<string'>,
-	size: Uint16Array.from([w<Int>, h<Int>]),
-	url<String>,
-	debug<Boolean>
+  title<string'>,
+  size: Uint16Array.from([w<Int>, h<Int>]),
+  url<String>,
+  debug<Boolean>
 });
 ```
 
@@ -168,8 +168,8 @@ This interface enables a sender in the webview to invoke a REST API backend Node
 ```
 let resp = await fetch(`${window.location.href}api/doSomething`); // GET
 resp = await fetch(
-	`${window.location.href}api/doSomething`,
-	{method: 'POST'}
+  `${window.location.href}api/doSomething`,
+  {method: 'POST'}
 ); // POST
 ```
 
