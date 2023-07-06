@@ -74,7 +74,7 @@ Display ```msg``` with ```title``` and icon ```msgType```. Returns "done". ```ms
 const resp = Wui.notify('Message title', 'message text', 'info');
 ```
 
-```Wui.readFileDialog()<Object>```
+#### Wui.readFileDialog()\<Object\>
 
 Display a dialog for the user to select a file. Returns ```{path: filePath}``` where ```filePath``` is the absolute path to the file.
 
@@ -82,7 +82,7 @@ Display a dialog for the user to select a file. Returns ```{path: filePath}``` w
 const {path} = Wui.readFileDialog();
 ```
 
-```Wui.selectFolder()<Object>```
+#### Wui.selectFolder()\<Object\>
 
 Display a dialog for the user to select a folder. Returns ```{path: folderPath}``` where ```folderPath``` is the absolute path to the folder.
 
@@ -90,7 +90,7 @@ Display a dialog for the user to select a folder. Returns ```{path: folderPath}`
 const {path} = Wui.selectFolder();
 ```
 
-```Wui.writeFileDialog(defaultFileName<String>)<Object>```
+#### Wui.writeFileDialog(defaultFileName\<String\>)\<Object\>
 
 Display a dialog for the user to select a file to write to; defaults to  ```defaultFileName```. Returns ```{path: filePath}``` where ```filePath``` is the absolute path to the file.
 
@@ -102,7 +102,7 @@ const {path} = Wui.readFileDialog('defaultFileName');
 
 ```Wui``` has methods for reading and writing files.
 
-```Wui.readFile(filePath<String>)<Object>```
+#### Wui.readFile(filePath\<String\>)\<Object\>
 
 Read the file ```filePath```. Returns ```{data: fileContents}``` where ```fileContents``` is a string containing the the file's contents.
 
@@ -110,7 +110,7 @@ Read the file ```filePath```. Returns ```{data: fileContents}``` where ```fileCo
 const {data} = Wui.readFile(filePath);
 ```
 
-```Wui.writeFile(filePath<String>, data<String)<Object>```
+**Wui.writeFile(filePath\<String\>, data\<String\>)\<Object\>**
 
 Writes ```data``` to the file ```filePath```. Returns "done".
 
