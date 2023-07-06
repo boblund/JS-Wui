@@ -102,7 +102,7 @@ const {path} = Wui.readFileDialog('defaultFileName');
 
 ```Wui``` has methods for reading and writing files.
 
-#### Wui.readFile(filePath\<String\>)\<Object\>
+### Wui.readFile(filePath\<String\>)\<Object\>
 
 Read the file ```filePath```. Returns ```{data: fileContents}``` where ```fileContents``` is a string containing the the file's contents.
 
@@ -110,7 +110,7 @@ Read the file ```filePath```. Returns ```{data: fileContents}``` where ```fileCo
 const {data} = Wui.readFile(filePath);
 ```
 
-**Wui.writeFile(filePath\<String\>, data\<String\>)\<Object\>**
+#### Wui.writeFile(filePath\<String\>, data\<String\>)\<Object\>
 
 Writes ```data``` to the file ```filePath```. Returns "done".
 
