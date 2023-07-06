@@ -129,45 +129,32 @@ void Start(const Napi::CallbackInfo& info) {
 		delete notify;
 
 		let maxQueueLength = 0,
-			ipcQueue = {}
+			ipcQueue = {},
 			websocket = new WebSocket(`ws://${window.location.host}`);
 
-		Wui.sendIpc = (type, msg, cb=null) => {
-			let id = null;
-			while(true) {
-				id = btoa(Math.random().toString()).slice(3);
-				if(ipcQueue[id] == undefined) break;
-			}
-			let rVal = null;
-			if( cb != null ) {
-				ipcQueue[id] = cb;
+		Wui.send = (route, msg) => { websocket.send(JSON.stringify({route, msg})); };
+		Wui.on = (route, cb) => {
+			if(websocket.readyState !== WebSocket.CLOSED){
+				ipcQueue[route] = cb;
+				return true;
 			} else {
-				rVal = new Promise((res, rej) => {
-					ipcQueue[id] = (error, msg) => {
-						(error ? rej : res)(msg);
-					};
-				});
+				return false;
 			}
-		
-			websocket.send(JSON.stringify({
-				route: type,
-				data: {id, msg}
-			}));
-		
-			return rVal;
+		};
+
+		Wui.close = route => {
+			Wui.send(route, {route, msg: {type: 'close'}});
+			delete ipcQueue[route];
 		};
 
 		websocket.onmessage = wsMsg => {
-			try {
-				const {id, msg} = JSON.parse( wsMsg.data );
-				ipcQueue[id](false, msg); // error always false as of now
-				delete ipcQueue[ id ];
-			} catch( e ) {
-				console.error( `websocket.onmessage error: ${ e }` );
-			}
+			const {route, msg} = JSON.parse( wsMsg.data );
+			if(msg.type == 'close') delete ipcQueue[route];
+			if(ipcQueue[route] != undefined) ipcQueue[route](msg);
 		};
 
 		websocket.addEventListener("close", (event) => {
+			Object.keys(ipcQueue).forEach(route => { Wui.close(route); });
 			console.log(`WebSocket close: code ${event.code} reason ${event.reason}`);
 		});
 

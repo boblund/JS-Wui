@@ -32,7 +32,7 @@ The web app server component directories are specified in ```appConfig.js``` whi
 
 - ./restApi: Contains directories that implement each REST API. Each REST interface is a directory which contains handlers for each method available on that intefaces. A handler is called with an object ```{event: headers: http_request_headers, body: http_request_body}```. The example defines the REST api ```apipath``` that implements ```GET```.
 
-- ./wsApi: A websocket is used to implement IPC between the frontend and backend. This directory contains handlers that implement IPC routes. There are two default routes (```onconnect``` and ```ondisconnect```) whose handlers are called when the websocket is opened and closed, respectively. Other routes are user-defined IPCs. The example defines the route ```wuiipc``` and shows the handlers for ```onconnect```, ```ondisconnect``` and ```wuiipc```.
+- ./wsApi: A websocket is used to implement IPC between the frontend webview and backend handlers. IPC routes, e.g. ```route1```, between the webview and their handlers are multiplexed onto a websocket. This directory contains IPC routes handlers that are named for their route, e.g. ```route1.js``` for ```route1```
 
 # Webview Interface <a name="webview"></a>
 
@@ -120,27 +120,48 @@ const resp = Wui.writeFile(filePath, 'some data');
 
 ## IPC
 
-This interface enables a sender in the webview to send a message over a websocket to a backend NodeJS handler. 
+This interface enables a sender in the webview to send and receive messages over a websocket with a backend NodeJS handler.
 
-```Wui.send(route<String>, msg<Object> [, callback<Function>])<Promise> | null```
+### Webview Inteface
 
-Messages with a given ```route``` are sent to the backend handler for that route. If ```callback``` is omitted, returns a Promise otherwise returns ```null```.
+```Wui.send(route<String>, msg<Object>)```
 
-Each sent ```msg``` invokes an instance of the backend handler for the specified route. This handler's response  invokes the corresponding ```callback``` or resolves the ```Promise``` with a response .
+Sends ```msg``` to the hanlder for```route```.
+
+```Wui.on(route<String>, cb<Function>)```
+
+Calls ```cb``` with a message argument when a  message on ```route``` is received.
+
+### Route Handler Inteface
+
+```Wui.send(msg<Object>)```
+
+Sends ```msg``` on this handler's IPC.
+
+```Wui.onmessage(cb<Function>)```
+
+Calls ```cb``` with a message argument when a  message is received.
 
 ```
-const resp = await Wui.send('wuiipc, {aMessage});
-.
-.
-.
-Wui.send('wuiipc', {aMessage}, resp => {
-	//Do something
+// handler route1.js
+exports.handler = ws => {
+	ws.onmessage(msg => {
+		let resp = //do something with msg
+		ws.send(resp);
+	})
+}
+
+// webview
+Wui.on('route1', msg => {
+	//do something with msg
 })
+
+Wui.send('route1', msg);
 ```
 
 ## REST
 
-This interface enables a sender in the webview to invoke a REST API backend NodeJS handler. A backend handler is selected based on the API URL and the request method. The URL is ```${window.location.href}api/${apiName}```.
+This interface enables a sender in the webview to invoke a REST API backend NodeJS handler. A backend handler is selected based on the API URL and the request method. The URL is ``` `${window.location.href}api/${apiName}` ```.
 
 ```fetch``` example:
 

@@ -14,39 +14,24 @@ function delay( msec ) {
 }
 
 let keepRunning = false;
+Wui.on('wuiipc', (resp) => {
+	wsresp.innerHTML = `await: ${JSON.stringify(resp)}`;
+});
 
-async function start(){
+function start(){
 	startbtn.hidden = true;
 	stopbtn.hidden = false;
 	keepRunning = true;
 
 	const msg = {type: 'someNodeFunction', value: 'args' } ;
-
-	while( keepRunning ){
-		if( Math.round(Math.random()) == 1 ? 'await' : 'cb' === 'await' ) { // random send modes
-			let resp;
-			try {
-				resp = await Wui.sendIpc('wuiipc', msg); //JSON.stringify(msg) );
-				// do something with resp
-				wsresp.innerHTML = `await: ${JSON.stringify(resp)}`;
-			} catch(e) {
-				// handle error
-				wsresp.innerHTML = `await error: ${JSON.stringify(resp)}`;
-			}
-		} else {
-			Wui.sendIpc('wuiipc', msg, (err, resp) => {
-				if(err) {
-					// handle error
-					wsresp.innerHTML = `callback error: ${JSON.stringify(resp)}`;
-				} else {
-					// do something with resp
-					wsresp.innerHTML = `callback: ${JSON.stringify(resp)}`;
-				}
-			});
+	Wui.send('wuiipc', msg);
+	Wui.on('wuiipc', async (resp) => {
+		wsresp.innerHTML = `await: ${JSON.stringify(resp)}`;
+		if(keepRunning) {
+			await delay((Math.random() * 1000) * .3 ); // 0 to last multiplier seconds
+			Wui.send('wuiipc', msg);
 		}
-
-		await delay((Math.random() * 1000) * .3 ); // 0 to last multiplier seconds
-	};
+	});
 };
 
 function stop() {
