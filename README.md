@@ -66,7 +66,7 @@ Display ```msg``` with ```title``` and icon ```msgType```. Returns the message p
 const button = Wui.message('Message title', 'message text', 'info');
 ```
 
-```Wui.notify(title<String>, msg<String>, msgType<String>)<String>```
+#### Wui.notify(title\<String\>, msg\<String\>, msgType\<String\>)\<String\>```
 
 Display ```msg``` with ```title``` and icon ```msgType```. Returns "done". ```msgType``` can be "info", "question" or "warning".
 
