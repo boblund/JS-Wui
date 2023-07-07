@@ -136,20 +136,22 @@ Calls ```cb``` with a message argument when a  message on ```route``` is receive
 
 ### Route Handler Interface
 
-#### Wui.send(msg\<Object\>)
+A IPC handler function is called with an ```ipc``` object.
+
+#### ipc.send(msg\<Object\>)
 
 Sends ```msg``` on this handler's IPC.
 
-#### Wui.onmessage(cb\<Function\>)
+#### ipc.onmessage(cb\<Function\>)
 
 Calls ```cb``` with a message argument when a  message is received.
 
 ```
 // handler route1.js
-exports.handler = ws => {
-  ws.onmessage(msg => {
+exports.handler = ipc => {
+  ipc.onmessage(msg => {
     let resp = //do something with msg
-    ws.send(resp);
+    ipc.send(resp);
   })
 }
 
