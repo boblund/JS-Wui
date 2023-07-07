@@ -122,7 +122,7 @@ const resp = Wui.writeFile(filePath, 'some data');
 
 ## IPC
 
-These interfaces enable sending and receiving messages over a websocket between webview and backend NodeJS handlers.
+These interfaces enable sending and receiving messages over a websocket between webview and backend NodeJS handlers. The message can be any JavaScript object where object is equivalent to JSON.parse(JSON.stringify(object)).
 
 ### Webview Interface
 
