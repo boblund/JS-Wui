@@ -9,7 +9,7 @@ function delay( msec ) {
 
 exports.handler = async (ipc) => {
 	let cnt = 0;
-	await delay(5); // wait for Webview to start
+	await delay(10); // wait for Webview to start
 	ipc.send({type: 'handler', value: 'start'});
 	ipc.onmessage(async msg => {
 		msg.type += ' resp';
