@@ -32,7 +32,7 @@ The web app server component directories are specified in ```appConfig.js``` whi
 
 - ./restApi: Contains directories that implement each REST API. Each REST interface is a directory which contains handlers for each method available on that intefaces. A handler is called with an object ```{headers: http_request_headers, body: http_request_body}```. The example defines the REST api ```apipath``` that implements ```GET```.
 
-- ./wsApi: A websocket is used to implement IPC between the frontend webview and backend handlers. IPC routes, e.g. ```route1```, between the webview and their handlers are multiplexed onto a websocket. This directory contains IPC routes handlers that are named for their route, e.g. ```route1.js``` for ```route1```
+- ./wsApi: A websocket is used to implement IPC between the frontend webview and backend handlers. IPC channels, e.g. ```channel1```, between the webview and their handlers are multiplexed onto a websocket. This directory contains IPC channel handlers that are named for their channel, e.g. ```channel1.js``` for ```channel1```
 
 # Webview Interface <a name="webview"></a>
 
@@ -122,21 +122,21 @@ const resp = Wui.writeFile(filePath, 'some data');
 
 ## IPC
 
-These interfaces enable sending and receiving messages over a websocket between webview and backend NodeJS handlers. The message can be any JavaScript object where object is equivalent to JSON.parse(JSON.stringify(object)).
+The IPC interface enables sending and receiving messages over a websocket between webview and backend NodeJS handlers. One or more IPC channels can defined. An IPC channel has a user-defined nameds and a corresponding handler function in a *.js file of the same name. There can be any number of channels. The message can be any JavaScript object where object is equivalent to JSON.parse(JSON.stringify(object)).
 
 ### Webview Interface
 
-#### Wui.send(route\<String\>, msg\<Object\>)
+#### Wui.send(channel\<String\>, msg\<Object\>)
 
-Sends ```msg``` to the handler for```route```.
+Sends ```msg``` to the handler for```channel```.
 
-#### Wui.on(route\<String\>, cb\<Function\>)\<Boolean\>
+#### Wui.on(channel\<String\>, cb\<Function\>)\<Boolean\>
 
-Calls ```cb``` with a message argument when a  message on ```route``` is received. Returns ```false``` if the underlying websocket is closed otherwise ```true```.
+Calls ```cb``` with a message argument when a  message on ```channel``` is received. Returns ```false``` if the underlying websocket is closed otherwise ```true```.
 
-### Route Handler Interface
+### Channel Handler Interface
 
-A IPC handler function is called with an ```ipc``` object.
+The IPC handler function is called with an ```ipc``` object.
 
 #### ipc.send(msg\<Object\>)
 
@@ -147,7 +147,7 @@ Sends ```msg``` on this handler's IPC.
 Calls ```cb``` with a message argument when a  message is received.
 
 ```
-// handler route1.js
+// handler channel1.js
 exports.handler = ipc => {
   ipc.onmessage(msg => {
     let resp = //do something with msg
@@ -156,11 +156,11 @@ exports.handler = ipc => {
 }
 
 // webview
-Wui.on('route1', msg => {
+Wui.on('channel1', msg => {
   //do something with msg
 })
 
-Wui.send('route1', msg);
+Wui.send('channel1', msg);
 ```
 
 ## REST
