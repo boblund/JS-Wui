@@ -89,7 +89,14 @@ void Start(const Napi::CallbackInfo& info) {
 			? pfd::icon::warning : (msgType == "question")
 				? pfd::icon::question : pfd::icon::error;
 
-		auto m = pfd::message(title, msg, pfd::choice::ok, _icon);
+		auto choice = (msgType == "info")
+			? pfd::choice::ok : (msgType == "warning")
+				? pfd::choice::ok_cancel : (msgType == "question")
+					? pfd::choice::yes_no : pfd::choice::ok;
+
+		//auto m = pfd::message(title, msg, pfd::choice::ok, _icon);
+
+		auto m = pfd::message(title, msg, choice, _icon);
 
 		// Do something according to the selected button
 		switch (m.result()) {
@@ -157,6 +164,12 @@ void Start(const Napi::CallbackInfo& info) {
 			Object.keys(ipcQueue).forEach(route => { Wui.close(route); });
 			console.log(`WebSocket close: code ${event.code} reason ${event.reason}`);
 		});
+
+		alert = (m) => Wui.message("Message", m, "info").then();
+		confirm = async (m) => {
+			let r = (await Wui.message("Message", m, "warning"))[0];
+			return r == 'ok' ? true : false;
+		}
 
 	)"""");
 
